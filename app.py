@@ -45,7 +45,6 @@ if "quiz_index" not in st.session_state:
 if "quiz_score" not in st.session_state:
     st.session_state.quiz_score = 0
 
-# Dynamic Red Teamer Pool management state parameters
 if "available_pool" not in st.session_state:
     st.session_state.available_pool = list(team_members)
 
@@ -71,7 +70,6 @@ def assign_next_victim():
     if st.session_state.available_pool:
         st.session_state.selected_victim = random.choice(st.session_state.available_pool)
     else:
-        # Re-initialize master pool if capacity exhausted
         st.session_state.available_pool = list(team_members)
         st.session_state.selected_victim = random.choice(st.session_state.available_pool)
 
@@ -227,7 +225,7 @@ elif current_page == "💡 Prompt Engineering (Examples)":
 elif current_page == "🧠 Interactive Knowledge Check":
     st.header("✏️ PKT Practice Challenge (One-by-One Engine)")
     
-    # Quiz Data Matrix
+    # Quiz Data Matrix incorporating comprehensive explanations
     questions = [
         {
             "id": 1,
@@ -239,7 +237,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. An opinion on a historical topic that is no longer widely considered to be sensitive in society."
             ],
             "correct": "B. A statement where alternative canonical answers exist, or where undue weight is placed on a peripheral fact.",
-            "exp": "Under the policy, 'Non-representative' means alternative canonical answers exist or undue weight is placed on a peripheral fact."
+            "exp": "Under the policy, 'Non-representative' means alternative canonical answers exist or undue weight is placed on a peripheral fact. Option A defines 'Demonstrably false', Option C defines a 'Freshness' issue, and Option D represents an excluded non-sensitive historical topic."
         },
         {
             "id": 2,
@@ -251,7 +249,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. Violative because it is demonstrably false according to primary news sources."
             ],
             "correct": "C. Non-violative, and marked as 'Unrelated to Safety' because the event is non-sensitive and out of scope.",
-            "exp": "Factual errors regarding non-sensitive, non-political events like chess championships do not fall under any public interest vertical and are treated as out-of-scope product quality losses."
+            "exp": "Factual errors regarding non-sensitive, non-political events like chess championships do not fall under any public interest vertical and are treated as out-of-scope product quality losses ('Unrelated to Safety')."
         },
         {
             "id": 3,
@@ -263,7 +261,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. Asserting that the Battle of Waterloo occurred at 9:02 AM instead of 9:00 AM."
             ],
             "correct": "B. Claiming that only 3 buildings collapsed in New York City during the 9/11 terrorist attacks.",
-            "exp": "Sensitive historical facts about major global events (like 9/11 building collapses) are in-scope."
+            "exp": "Sensitive historical facts about major global events (like 9/11 building collapses) are in-scope. Fictional details about non-sensitive landmarks (St. Peter's Basilica marble), benign political details (Waterloo time discrepancies), or non-sensitive historical topics (the War of 1812) are out of scope."
         },
         {
             "id": 4,
@@ -275,7 +273,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. It is a freshness quality loss because Ellen DeGeneres changed her gender status after January 2024."
             ],
             "correct": "B. It violates the 'Identity Topics' vertical by incorrectly labeling a sexual orientation as a gender.",
-            "exp": "The Identity vertical covers gender pronouns and terminology. Because 'Lesbian' is a sexual orientation and not a gender, the response is factually incorrect."
+            "exp": "The Identity vertical covers gender pronouns and terminology. Because 'Lesbian' is a sexual orientation and not a gender, the model's response is factually incorrect and misrepresents identity groups."
         },
         {
             "id": 5,
@@ -287,7 +285,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. It must be verified exclusively through .gov top-level domains."
             ],
             "correct": "A. It must be defined as high priority by a government entity and at least two authoritative news sources.",
-            "exp": "Prominent public debates are strictly defined as high-priority agenda items of importance validated by political/research bodies and at least two news sources."
+            "exp": "Prominent public debates are strictly defined as high-priority agenda items of particular importance, validated by political, research, or government entities, and at least two authoritative news sources."
         },
         {
             "id": 6,
@@ -299,7 +297,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. Any website found on the dark web ending in .onion."
             ],
             "correct": "B. Independent credible resources, mainstream media, Wikipedia, or government websites ending in .gov.",
-            "exp": "Acceptable resources include official government websites (.gov), official entity/regulator pages, independent credible Top-Level Domains (.edu, .org), mainstream media, or Wikipedia."
+            "exp": "Acceptable resources for verifying factual accuracy include official government websites (.gov), official entity/regulator pages, independent credible Top-Level Domains (.edu, .org), mainstream media, or Wikipedia."
         },
         {
             "id": 7,
@@ -311,19 +309,19 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. It violates the PII policy by revealing sensitive medical records of a public figure."
             ],
             "correct": "A. It uses a non-current name (known as a deadname) of an individual, which misrepresents their identity.",
-            "exp": "The Identity vertical explicitly covers non-current names of individuals (known as dead names)."
+            "exp": "The Identity and Terminology vertical explicitly covers 'non-current names of individuals (known as dead names)' such as Bruce Jenner for Caitlyn Jenner. Providing a deadname instead of the correct name is a violation because the inaccuracy negatively impacts or misrepresents identity groups."
         },
         {
             "id": 8,
             "q": "How does the Factually Inaccurate policy handle historical or global events that are no longer sensitive?",
             "options": [
                 "A. They are evaluated under the Conspiratorial Content guidelines instead.",
-                "B. They are completely excluded from the policy scope (e.g., facts about the War of 1812).",
+                "B. They am completely excluded from the policy scope (e.g., facts about the War of 1812).",
                 "C. They are automatically marked as a violation if they contain any typographical errors.",
                 "D. They are evaluated under the Harassment policy if they mention dead historical figures."
             ],
-            "correct": "B. They are completely excluded from the policy scope (e.g., facts about the War of 1812).",
-            "exp": "The policy explicitly excludes opinions on historical topics that are no longer widely considered to be sensitive, citing the War of 1812 as an example."
+            "correct": "B. They am completely excluded from the policy scope (e.g., facts about the War of 1812).",
+            "exp": "Factual inaccuracies are only checked if they lead to distorted views of sensitive matters of import and contention in their society. The policy explicitly excludes 'opinions on historical topics that are no longer widely considered to be sensitive,' citing the War of 1812 as an example."
         },
         {
             "id": 9,
@@ -335,7 +333,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. There is no time limit; they must research until they find a definitive primary source."
             ],
             "correct": "B. 5 minutes.",
-            "exp": "Under the evaluation guidelines, agents should not spend more than 5 minutes researching topics to verify accuracy."
+            "exp": "Under the evaluation guidelines, agents should not spend more than 5 minutes researching topics to verify factual accuracy."
         },
         {
             "id": 10,
@@ -347,7 +345,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 "D. Because the prompt was evaluated using the 'Prompt as Context' rule to reveal hateful intent."
             ],
             "correct": "A. Because a main tenet of Islam is that no physical depiction of the Prophet Mohammad exists; thus, any depiction is factually inaccurate.",
-            "exp": "Because a core tenet of Islam is that no physical depiction of the Prophet Mohammad exists, returning any image representing him is automatically factually inaccurate."
+            "exp": "Because a core tenet of Islam is that no physical depiction of the Prophet Mohammad exists, returning any image representing him is factually inaccurate. This covers all permutations of his name."
         }
     ]
 
@@ -383,17 +381,27 @@ elif current_page == "🧠 Interactive Knowledge Check":
             if user_choice == current_q["correct"]:
                 st.balloons()
                 st.success("🎉 **Correct! Stellar Vulnerability Assessment!**")
-                st.html(f"<div style='color:#155724; background-color:#d4edda; padding:1rem; border-radius:0.25rem; margin-bottom:1rem;'><b>KB Guidance Alignment:</b> {current_q['exp']}</div>")
+                st.html(f"""
+                <div style='color:#155724; background-color:#d4edda; padding:1rem; border-radius:0.25rem; margin-bottom:1rem;'>
+                    <b>✨ Correct Answer Matrix Checked:</b> {current_q['correct']}<br><br>
+                    <b>📋 Official KB Guidance Alignment:</b> {current_q['exp']}
+                </div>
+                """)
                 
                 if st.button("Move to Next Question ➡️"):
                     st.session_state.quiz_score += 1
                     st.session_state.quiz_index += 1
-                    # Strip called operator from pool and compute next step target
                     assign_next_victim()
                     st.rerun()
             else:
                 st.error("😢🌧️💔 **Mishandled Safety Parameter Edge-Case!**")
-                st.html(f"<div style='color:#721c24; background-color:#f8d7da; padding:1rem; border-radius:0.25rem; margin-bottom:1rem;'><b>Incorrect Selection Feedback:</b> Deviation from KB framework noted.<br><br><b>Correct Operational Path:</b> {current_q['correct']}<br><br><b>Policy Logic:</b> {current_q['exp']}</div>")
+                st.html(f"""
+                <div style='color:#721c24; background-color:#f8d7da; padding:1rem; border-radius:0.25rem; margin-bottom:1rem;'>
+                    <b>❌ Selection Feedback:</b> Deviation from KB framework noted.<br><br>
+                    <b>⚙️ Correct Operational Path:</b> {current_q['correct']}<br><br>
+                    <b>📋 Official KB Policy Logic:</b> {current_q['exp']}
+                </div>
+                """)
                 
                 if st.button("Proceed to Next Question ➡️"):
                     st.session_state.quiz_index += 1
