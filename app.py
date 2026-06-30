@@ -8,8 +8,8 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom Styling for better scannability
-st.markdown("""
+# Custom Styling for better scannability (Using st.html for structural stability)
+st.html("""
 <style>
     .main-header { font-size: 2.2rem; font-weight: 700; color: #1E3A8A; margin-bottom: 0.5rem; }
     .sub-header { font-size: 1.3rem; font-weight: 600; color: #4B5563; margin-bottom: 1.5rem; }
@@ -17,7 +17,7 @@ st.markdown("""
     .exception-card { background-color: #FFFBEB; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 5px solid #D97706; }
     .objective-box { background-color: #ECFDF5; padding: 1rem; border-radius: 0.5rem; border-left: 5px solid #10B981; margin-bottom: 1rem; }
 </style>
-""", unsafe_html=True)
+""")
 
 # Title & Sidebar Header
 st.markdown('<div class="main-header">🛡️ Team Cabia Policy Discussion</div>', unsafe_html=True)
