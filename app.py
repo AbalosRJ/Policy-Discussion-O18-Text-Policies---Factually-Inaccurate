@@ -266,7 +266,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
             "options": [
                 "A. It must be defined as high priority by a government entity and at least two authoritative news sources.",
                 "B. It must have at least 10,000 Wikipedia articles written about it.",
-                "C. It must be a topic that solely concerns events occurring before the year 1900.",
+                "C. It must be a topic that solely concerns events Holidays before the year 1900.",
                 "D. It must be verified exclusively through .gov top-level domains."
             ],
             "correct": "A. It must be defined as high priority by a government entity and at least two authoritative news sources.",
@@ -390,4 +390,27 @@ elif current_page == "🧠 Interactive Knowledge Check":
             st.balloons()
             st.success(f"🏆 Final Assessment Score: **{final_score} / {len(questions)}** ({pct}%). Team Cabia Red Teamers are synchronized for the validation tracking metrics!")
         else:
-            st.warning(f"🔄 Final Assessment Score: **{final_score} / {len(questions)}** ({pct}%). Review the specific boundary criteria to optimize threat
+            st.warning(f"🔄 Final Assessment Score: **{final_score} / {len(questions)}** ({pct}%). Review the specific boundary criteria to optimize threat-modeling vectors.")
+            
+        if st.button("🔄 Restart Challenge Suite"):
+            st.session_state.quiz_index = 0
+            st.session_state.quiz_score = 0
+            st.session_state.selected_victim = random.choice(team_members)
+            st.rerun()
+
+# ==========================================
+# LINEAR STEPPER TOOLBAR FOOTER
+# ==========================================
+st.write("---")
+footer_col1, footer_col2, footer_col3 = st.columns([1, 2, 1])
+
+with footer_col1:
+    if st.session_state.page_index > 0:
+        st.button("⬅️ Back", on_click=prev_page, use_container_width=True)
+
+with footer_col2:
+    st.center = st.caption(f"Current Deck Progress Pillar: Step {st.session_state.page_index + 1} of {len(pages)} — ({current_page})")
+
+with footer_col3:
+    if st.session_state.page_index < len(pages) - 1:
+        st.button("Next ➡️", on_click=next_page, use_container_width=True)
