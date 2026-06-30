@@ -26,6 +26,15 @@ st.html("""
 </div>
 """)
 
+# Master List of Teammates
+team_members = [
+    "Añonuevo, Suzanne Madelle", "Cacho, Alessandra Nicole", "De Castro, Mariane Dorothy",
+    "Dela Cruz, Denmark", "Garcia, Cherry Grace", "Jarolan, Mark Joseph",
+    "Javero, Dwight Jeffrey", "Mosqueda, Gray-Ann", "Munar, Rochelle Gayle",
+    "Paniterce, John Edward", "Paulino, Lenard Ivan", "Punzalan, Hebreo Red",
+    "Ruivivar, Marvina", "Tuba, Marilou", "Villajuan, Macy", "Vinas, Christian Dave"
+]
+
 # Initialize Session States for Multi-page Flow & Quiz Progress
 if "page_index" not in st.session_state:
     st.session_state.page_index = 0
@@ -36,17 +45,12 @@ if "quiz_index" not in st.session_state:
 if "quiz_score" not in st.session_state:
     st.session_state.quiz_score = 0
 
-if "selected_victim" not in st.session_state:
-    st.session_state.selected_victim = None
+# Dynamic Red Teamer Pool management state parameters
+if "available_pool" not in st.session_state:
+    st.session_state.available_pool = list(team_members)
 
-# List of Teammates for Random cold-calling
-team_members = [
-    "Añonuevo, Suzanne Madelle", "Cacho, Alessandra Nicole", "De Castro, Mariane Dorothy",
-    "Dela Cruz, Denmark", "Garcia, Cherry Grace", "Jarolan, Mark Joseph",
-    "Javero, Dwight Jeffrey", "Mosqueda, Gray-Ann", "Munar, Rochelle Gayle",
-    "Paniterce, John Edward", "Paulino, Lenard Ivan", "Punzalan, Hebreo Red",
-    "Ruivivar, Marvina", "Tuba, Marilou", "Villajuan, Macy", "Vinas, Christian Dave"
-]
+if "selected_victim" not in st.session_state:
+    st.session_state.selected_victim = random.choice(st.session_state.available_pool)
 
 # Pages structure map
 pages = [
@@ -59,6 +63,18 @@ pages = [
 
 current_page = pages[st.session_state.page_index]
 
+# Helper function to assign a fresh unique candidate
+def assign_next_victim():
+    if st.session_state.selected_victim in st.session_state.available_pool:
+        st.session_state.available_pool.remove(st.session_state.selected_victim)
+    
+    if st.session_state.available_pool:
+        st.session_state.selected_victim = random.choice(st.session_state.available_pool)
+    else:
+        # Re-initialize master pool if capacity exhausted
+        st.session_state.available_pool = list(team_members)
+        st.session_state.selected_victim = random.choice(st.session_state.available_pool)
+
 # Helper functions for linear flow navigation
 def next_page():
     if st.session_state.page_index < len(pages) - 1:
@@ -66,7 +82,8 @@ def next_page():
         if st.session_state.page_index == 4:
             st.session_state.quiz_index = 0
             st.session_state.quiz_score = 0
-            st.session_state.selected_victim = random.choice(team_members)
+            st.session_state.available_pool = list(team_members)
+            st.session_state.selected_victim = random.choice(st.session_state.available_pool)
 
 def prev_page():
     if st.session_state.page_index > 0:
@@ -343,21 +360,22 @@ elif current_page == "🧠 Interactive Knowledge Check":
         if st.session_state.selected_victim:
             st.html(f"""
             <div class="cold-call-box">
-                🎯 <b>Red Team Target Operator:</b> Next up to analyze this tracking case is: 
+                <b>🎯 Red Team Target Operator:</b> Next up to analyze this tracking case is: 
                 <span style="color:#2563EB; font-weight:bold; font-size:1.15rem;">{st.session_state.selected_victim}</span>
+                <br><small style="color:#6B7280;">(Operators remaining in pool: {len(st.session_state.available_pool)})</small>
             </div>
             """)
         
-        # Interactive spin button placed right underneath the text box
-        if st.button("🎲 Spin the Wheel (Change Target Operator)"):
-            st.session_state.selected_victim = random.choice(team_members)
-            st.rerun()
+        # Spin the wheel button pulls exclusively from remaining elements inside session pool
+        if st.button("🎲 Spin the Wheel (Pick another unique Operator)"):
+            if st.session_state.available_pool:
+                st.session_state.selected_victim = random.choice(st.session_state.available_pool)
+                st.rerun()
             
         st.write("")
         st.markdown(f"### **Question {idx + 1} of {len(questions)}**")
         st.markdown(f"#### {current_q['q']}")
         
-        # Input choice
         user_choice = st.radio("Select your alignment evaluation matrix option:", current_q["options"], key=f"active_q_{idx}", index=None)
         
         if user_choice:
@@ -370,7 +388,8 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 if st.button("Move to Next Question ➡️"):
                     st.session_state.quiz_score += 1
                     st.session_state.quiz_index += 1
-                    st.session_state.selected_victim = random.choice(team_members)
+                    # Strip called operator from pool and compute next step target
+                    assign_next_victim()
                     st.rerun()
             else:
                 st.error("😢🌧️💔 **Mishandled Safety Parameter Edge-Case!**")
@@ -378,7 +397,7 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 
                 if st.button("Proceed to Next Question ➡️"):
                     st.session_state.quiz_index += 1
-                    st.session_state.selected_victim = random.choice(team_members)
+                    assign_next_victim()
                     st.rerun()
                     
     else:
@@ -392,10 +411,11 @@ elif current_page == "🧠 Interactive Knowledge Check":
         else:
             st.warning(f"🔄 Final Assessment Score: **{final_score} / {len(questions)}** ({pct}%). Review the specific boundary criteria to optimize threat-modeling vectors.")
             
-        if st.button("🔄 Restart Challenge Suite"):
+        if st.button("🔄 Restart Challenge Suite & Refresh Operator Pool"):
             st.session_state.quiz_index = 0
             st.session_state.quiz_score = 0
-            st.session_state.selected_victim = random.choice(team_members)
+            st.session_state.available_pool = list(team_members)
+            st.session_state.selected_victim = random.choice(st.session_state.available_pool)
             st.rerun()
 
 # ==========================================
