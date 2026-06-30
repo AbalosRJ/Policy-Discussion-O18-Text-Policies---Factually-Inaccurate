@@ -8,6 +8,17 @@ st.set_page_config(
     layout="wide"
 )
 
+# Crucial JS Injector: Forces the browser context to scroll back up to (0,0) on page loads
+st.components.v1.html(
+    """
+    <script>
+        window.parent.document.querySelector('.main .block-container').scrollIntoView({behavior: 'instant'});
+    </script>
+    """,
+    height=0,
+    width=0
+)
+
 # Custom Styling & HTML Headers safely injected
 st.html("""
 <style>
