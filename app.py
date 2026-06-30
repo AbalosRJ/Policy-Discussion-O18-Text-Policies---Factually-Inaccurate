@@ -8,6 +8,9 @@ st.set_page_config(
     layout="wide"
 )
 
+# 🌟 Structural Anchor: Forces Streamlit view matrix to reference coordinate (0,0) on execution
+st.html("<div id='top_anchor'></div>")
+
 # Custom Styling & HTML Headers safely injected
 st.html("""
 <style>
@@ -73,7 +76,7 @@ def assign_next_victim():
         st.session_state.available_pool = list(team_members)
         st.session_state.selected_victim = random.choice(st.session_state.available_pool)
 
-# Helper functions for linear flow navigation
+# Helper functions for linear flow navigation with anchor routing targets
 def next_page():
     if st.session_state.page_index < len(pages) - 1:
         st.session_state.page_index += 1
@@ -86,21 +89,6 @@ def next_page():
 def prev_page():
     if st.session_state.page_index > 0:
         st.session_state.page_index -= 1
-
-# ==========================================
-# 🌟 TOP NAVIGATION BAR
-# ==========================================
-top_col1, top_col2, top_col3 = st.columns([1, 2, 1])
-with top_col1:
-    if st.session_state.page_index > 0:
-        st.button("⬅️ Previous Section", on_click=prev_page, key="top_prev", use_container_width=True)
-with top_col2:
-    st.html(f"<div style='text-align:center; color:#4B5563; font-weight:600; padding-top:0.4rem;'>Pillar {st.session_state.page_index + 1} of {len(pages)}: {current_page}</div>")
-with top_col3:
-    if st.session_state.page_index < len(pages) - 1:
-        st.button("Next Section ➡️", on_click=next_page, key="top_next", use_container_width=True)
-
-st.write("---")
 
 # ==========================================
 # PAGE 0: OVERVIEW & OBJECTIVES
@@ -400,10 +388,12 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 </div>
                 """)
                 
-                if st.button("Move to Next Question ➡️"):
+                # Dynamic anchor link configuration built right inside the transition click step
+                if st.button("Move to Next Question ➡️", key="btn_next_q"):
                     st.session_state.quiz_score += 1
                     st.session_state.quiz_index += 1
                     assign_next_victim()
+                    st.html("<script>window.location.hash = '#top_anchor';</script>")
                     st.rerun()
             else:
                 st.error("😢🌧️💔 **Mishandled Safety Parameter Edge-Case!**")
@@ -415,9 +405,10 @@ elif current_page == "🧠 Interactive Knowledge Check":
                 </div>
                 """)
                 
-                if st.button("Proceed to Next Question ➡️"):
+                if st.button("Proceed to Next Question ➡️", key="btn_fail_next_q"):
                     st.session_state.quiz_index += 1
                     assign_next_victim()
+                    st.html("<script>window.location.hash = '#top_anchor';</script>")
                     st.rerun()
                     
     else:
@@ -436,18 +427,28 @@ elif current_page == "🧠 Interactive Knowledge Check":
             st.session_state.quiz_score = 0
             st.session_state.available_pool = list(team_members)
             st.session_state.selected_victim = random.choice(st.session_state.available_pool)
+            st.html("<script>window.location.hash = '#top_anchor';</script>")
             st.rerun()
 
 # ==========================================
-# 🌟 BOTTOM PARALLEL NAVIGATION BAR
+# 🌟 SINGLE FOOTER STEPPER (CLEAN & NON-REDUNDANT)
 # ==========================================
 st.write("---")
 footer_col1, footer_col2, footer_col3 = st.columns([1, 2, 1])
+
 with footer_col1:
     if st.session_state.page_index > 0:
-        st.button("⬅️ Previous Section", on_click=prev_page, key="bottom_prev", use_container_width=True)
+        if st.button("⬅️ Previous Section", use_container_width=True):
+            prev_page()
+            st.html("<script>window.location.hash = '#top_anchor';</script>")
+            st.rerun()
+
 with footer_col2:
-    st.html(f"<div style='text-align:center; color:#9CA3AF; font-size:0.85rem;'>Current Deck Progress Pillar: Step {st.session_state.page_index + 1} of {len(pages)}</div>")
+    st.center = st.caption(f"Current Deck Progress Pillar: Step {st.session_state.page_index + 1} of {len(pages)} — ({current_page})")
+
 with footer_col3:
     if st.session_state.page_index < len(pages) - 1:
-        st.button("Next Section ➡️", on_click=next_page, key="bottom_next", use_container_width=True)
+        if st.button("Next Section ➡️", use_container_width=True):
+            next_page()
+            st.html("<script>window.location.hash = '#top_anchor';</script>")
+            st.rerun()
