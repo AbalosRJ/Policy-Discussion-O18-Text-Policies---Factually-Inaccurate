@@ -1,14 +1,14 @@
 import streamlit as st
+import random
 
 # Set page configuration
 st.set_page_config(
     page_title="Team Cabia: O18 Policy Discussion",
     page_icon="🛡️",
-    layout="wide",
-    initial_sidebar_state="expanded"
+    layout="wide"
 )
 
-# Custom Styling & HTML Headers combined safely into st.html to prevent parsing errors
+# Custom Styling & HTML Headers safely injected
 st.html("""
 <style>
     .main-header { font-size: 2.2rem; font-weight: 700; color: #1E3A8A; margin-bottom: 0.5rem; }
@@ -16,31 +16,64 @@ st.html("""
     .card { background-color: #F3F4F6; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 5px solid #2563EB; }
     .exception-card { background-color: #FFFBEB; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1rem; border-left: 5px solid #D97706; }
     .objective-box { background-color: #ECFDF5; padding: 1rem; border-radius: 0.5rem; border-left: 5px solid #10B981; margin-bottom: 1rem; }
+    .cold-call-box { background-color: #EFF6FF; padding: 1rem; border-radius: 0.5rem; border: 2px dashed #3B82F6; margin-bottom: 1.5rem; text-align: center; }
 </style>
 
 <div class="main-header">🛡️ Team Cabia Policy Discussion</div>
 <div class="sub-header">O18 Text Policies: Factually Inaccurate (Religious, Historical, & Matters of Import)</div>
 """)
 
-# Sidebar Navigation
-with st.sidebar:
-    st.header("Navigation")
-    app_mode = st.radio("Go to section:", [
-        "📋 Overview & Objectives", 
-        "📚 Core Policy & Verticals", 
-        "🔍 Exceptions & Evaluation", 
-        "💡 Prompt Engineering (Examples)", 
-        "🧠 Interactive Knowledge Check"
-    ])
-    
-    st.write("---")
-    st.caption("**Time Management:** Max 15 mins total")
-    st.caption("**Target:** Deepen understanding to engineer bug-targeting prompts & boost PKT scores.")
+# Initialize Session States for Multi-page Flow & Quiz Progress
+if "page_index" not in st.session_state:
+    st.session_state.page_index = 0
+
+if "quiz_index" not in st.session_state:
+    st.session_state.quiz_index = 0
+
+if "quiz_score" not in st.session_state:
+    st.session_state.quiz_score = 0
+
+if "selected_victim" not in st.session_state:
+    st.session_state.selected_victim = None
+
+# List of Teammates for Random cold-calling
+team_members = [
+    "Añonuevo, Suzanne Madelle", "Cacho, Alessandra Nicole", "De Castro, Mariane Dorothy",
+    "Dela Cruz, Denmark", "Garcia, Cherry Grace", "Jarolan, Mark Joseph",
+    "Javero, Dwight Jeffrey", "Mosqueda, Gray-Ann", "Munar, Rochelle Gayle",
+    "Paniterce, John Edward", "Paulino, Lenard Ivan", "Punzalan, Hebreo Red",
+    "Ruivivar, Marvina", "Tuba, Marilou", "Villajuan, Macy", "Vinas, Christian Dave"
+]
+
+# Pages structure map
+pages = [
+    "📋 Overview & Objectives", 
+    "📚 Core Policy & Verticals", 
+    "🔍 Exceptions & Evaluation", 
+    "💡 Prompt Engineering (Examples)", 
+    "🧠 Interactive Knowledge Check"
+]
+
+current_page = pages[st.session_state.page_index]
+
+# Helper function to move down the presentation pipeline
+def next_page():
+    if st.session_state.page_index < len(pages) - 1:
+        st.session_state.page_index += 1
+        # Reset quiz parameters if changing pages
+        if st.session_state.page_index == 4:
+            st.session_state.quiz_index = 0
+            st.session_state.quiz_score = 0
+            st.session_state.selected_victim = random.choice(team_members)
+
+def prev_page():
+    if st.session_state.page_index > 0:
+        st.session_state.page_index -= 1
 
 # ==========================================
-# TAB 1: OVERVIEW & OBJECTIVES
+# PAGE 0: OVERVIEW & OBJECTIVES
 # ==========================================
-if app_mode == "📋 Overview & Objectives":
+if current_page == "📋 Overview & Objectives":
     st.header("🎯 Session Overview")
     
     col1, col2 = st.columns(2)
@@ -70,9 +103,9 @@ if app_mode == "📋 Overview & Objectives":
     )
 
 # ==========================================
-# TAB 2: CORE POLICY & VERTICALS
+# PAGE 1: CORE POLICY & VERTICALS
 # ==========================================
-elif app_mode == "📚 Core Policy & Verticals":
+elif current_page == "📚 Core Policy & Verticals":
     st.header("📝 Core Definitions & Public Interest Verticals")
     
     st.subheader("1. The Three Pillars of 'Incorrect Facts'")
@@ -93,7 +126,6 @@ elif app_mode == "📚 Core Policy & Verticals":
 
     st.write("---")
     st.subheader("2. Core Public Interest Verticals In-Scope")
-    
     tab_hist, tab_rel, tab_imp = st.tabs(["⏳ Historical Matters", "🕌 Religious Matters", "📢 Matters of Import"])
     
     with tab_hist:
@@ -102,14 +134,12 @@ elif app_mode == "📚 Core Policy & Verticals":
         * **In-Scope:** Wars, conflicts, geopolitical competitions, natural disasters, mass atrocities, and critical investigations. Major landmarks only count if they impact trust/historical understanding (e.g., claiming 94 buildings collapsed on 9/11).
         * **Out of Scope:** Non-sensitive facts (e.g., wrong marble type used for St. Peter’s Basilica) or historical topics no longer socially sensitive (e.g., The War of 1812).
         """)
-        
     with tab_rel:
         st.markdown("#### Religious Matters")
         st.markdown("""
         * **In-Scope:** Factual details about faiths, worship of the superhuman, transcendental, or spiritual, major religious/mythological figures, canonical texts, and blasphemy allegations.
         * **🚨 Critical Rule:** Under Islamic tenets, no physical depiction of Prophet Mohammad exists. Any image or detailed visual description generated of him is **automatically** a safety policy violation.
         """)
-        
     with tab_imp:
         st.markdown("#### Matters of Import & Contention (Politics, Civics, & Identity)")
         st.markdown("""
@@ -119,9 +149,9 @@ elif app_mode == "📚 Core Policy & Verticals":
         """)
 
 # ==========================================
-# TAB 3: EXCEPTIONS & EVALUATION
+# PAGE 2: EXCEPTIONS & EVALUATION
 # ==========================================
-elif app_mode == "🔍 Exceptions & Evaluation":
+elif current_page == "🔍 Exceptions & Evaluation":
     st.header("⚙️ Exceptions & Safety Evaluation Process")
     
     st.subheader("💡 Key Policy Exceptions (Non-Violative)")
@@ -132,7 +162,6 @@ elif app_mode == "🔍 Exceptions & Evaluation":
         Factual inaccuracies are permitted if explicitly presented within an Educational, Documentary, Scientific, or Artistic context, provided no other safety rules are broken.</div>""")
         st.html("""<div class="exception-card"><strong>🎭 Role-Playing</strong><br>
         If explicitly instructed to role-play a specific character, historical inaccuracies spoken in that character's voice do not violate policy.</div>""")
-        
     with col2:
         st.html("""<div class="exception-card"><strong>📅 Factuality vs. Freshness</strong><br>
         Errors stemming from a lack of post-January 2024 information are treated as "freshness" product quality losses, not safety violations (e.g., calling Joe Biden the current US President).</div>""")
@@ -150,9 +179,9 @@ elif app_mode == "🔍 Exceptions & Evaluation":
     """)
 
 # ==========================================
-# TAB 4: PROMPT ENGINEERING EXAMPLES
+# PAGE 3: PROMPT ENGINEERING EXAMPLES
 # ==========================================
-elif app_mode == "💡 Prompt Engineering (Examples)":
+elif current_page == "💡 Prompt Engineering (Examples)":
     st.header("🎯 Prompt Engineering for Bug Targeting")
     st.caption("How to use historical bug data patterns to engineer prompts that validate model alignment.")
     
@@ -174,13 +203,12 @@ elif app_mode == "💡 Prompt Engineering (Examples)":
     st.markdown("> **Why it matters:** Confusing sexual orientation with gender terminology constitutes an identity-group misrepresentation violation under O18.")
 
 # ==========================================
-# TAB 5: KNOWLEDGE CHECK
+# PAGE 4: INTERACTIVE QUIZ ENGINE
 # ==========================================
-elif app_mode == "🧠 Interactive Knowledge Check":
-    st.header("✏️ Test Your Knowledge: PKT Practice Challenge")
-    st.write("Use this live quiz to test the audience's mastery of the O18 Policy nuances.")
+elif current_page == "🧠 Interactive Knowledge Check":
+    st.header("✏️ PKT Practice Challenge (One-by-One Engine)")
     
-    # Quiz Data Setup
+    # Quiz Data Matrix
     questions = [
         {
             "id": 1,
@@ -192,7 +220,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. An opinion on a historical topic that is no longer widely considered to be sensitive in society."
             ],
             "correct": "B. A statement where alternative canonical answers exist, or where undue weight is placed on a peripheral fact.",
-            "exp": "Under the policy, 'Non-representative' means alternative canonical answers exist or undue weight is placed on a peripheral fact. Option A defines 'Demonstrably false', Option C defines a 'Freshness' issue, and Option D represents an excluded non-sensitive historical topic."
+            "exp": "Under the policy, 'Non-representative' means alternative canonical answers exist or undue weight is placed on a peripheral fact."
         },
         {
             "id": 2,
@@ -204,7 +232,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. Violative because it is demonstrably false according to primary news sources."
             ],
             "correct": "C. Non-violative, and marked as 'Unrelated to Safety' because the event is non-sensitive and out of scope.",
-            "exp": "Factual errors regarding non-sensitive, non-political events like chess championships do not fall under any public interest vertical and are treated as out-of-scope product quality losses ('Unrelated to Safety')."
+            "exp": "Factual errors regarding non-sensitive, non-political events like chess championships do not fall under any public interest vertical and are treated as out-of-scope product quality losses."
         },
         {
             "id": 3,
@@ -216,7 +244,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. Asserting that the Battle of Waterloo occurred at 9:02 AM instead of 9:00 AM."
             ],
             "correct": "B. Claiming that only 3 buildings collapsed in New York City during the 9/11 terrorist attacks.",
-            "exp": "Sensitive historical facts about major global events (like 9/11 building collapses) are in-scope. Fictional details about non-sensitive landmarks (St. Peter's Basilica marble), benign political details (Waterloo time discrepancies), or non-sensitive historical topics (the War of 1812) are out of scope."
+            "exp": "Sensitive historical facts about major global events (like 9/11 building collapses) are in-scope."
         },
         {
             "id": 4,
@@ -228,7 +256,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. It is a freshness quality loss because Ellen DeGeneres changed her gender status after January 2024."
             ],
             "correct": "B. It violates the 'Identity Topics' vertical by incorrectly labeling a sexual orientation as a gender.",
-            "exp": "The Identity vertical covers gender pronouns and terminology. Because 'Lesbian' is a sexual orientation and not a gender, the model's response is factually incorrect and misrepresents identity groups."
+            "exp": "The Identity vertical covers gender pronouns and terminology. Because 'Lesbian' is a sexual orientation and not a gender, the response is factually incorrect."
         },
         {
             "id": 5,
@@ -240,7 +268,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. It must be verified exclusively through .gov top-level domains."
             ],
             "correct": "A. It must be defined as high priority by a government entity and at least two authoritative news sources.",
-            "exp": "Prominent public debates are strictly defined as high-priority agenda items of particular importance, validated by political, research, or government entities, and at least two authoritative news sources."
+            "exp": "Prominent public debates are strictly defined as high-priority agenda items of importance validated by political/research bodies and at least two news sources."
         },
         {
             "id": 6,
@@ -252,7 +280,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. Any website found on the dark web ending in .onion."
             ],
             "correct": "B. Independent credible resources, mainstream media, Wikipedia, or government websites ending in .gov.",
-            "exp": "Acceptable resources for verifying factual accuracy include official government websites (.gov), official entity/regulator pages, independent credible Top-Level Domains (.edu, .org), mainstream media, or Wikipedia."
+            "exp": "Acceptable resources include official government websites (.gov), official entity/regulator pages, independent credible Top-Level Domains (.edu, .org), mainstream media, or Wikipedia."
         },
         {
             "id": 7,
@@ -264,7 +292,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. It violates the PII policy by revealing sensitive medical records of a public figure."
             ],
             "correct": "A. It uses a non-current name (known as a deadname) of an individual, which misrepresents their identity.",
-            "exp": "The Identity and Terminology vertical explicitly covers 'non-current names of individuals (known as dead names)' such as Bruce Jenner for Caitlyn Jenner. Providing a deadname instead of the correct name is a violation because the inaccuracy negatively impacts or misrepresents identity groups."
+            "exp": "The Identity vertical explicitly covers non-current names of individuals (known as dead names)."
         },
         {
             "id": 8,
@@ -276,7 +304,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. They are evaluated under the Harassment policy if they mention dead historical figures."
             ],
             "correct": "B. They are completely excluded from the policy scope (e.g., facts about the War of 1812).",
-            "exp": "Factual inaccuracies are only checked if they lead to distorted views of sensitive matters of import and contention in their society. The policy explicitly excludes 'opinions on historical topics that are no longer widely considered to be sensitive,' citing the War of 1812 as an example."
+            "exp": "The policy explicitly excludes opinions on historical topics that are no longer widely considered to be sensitive, citing the War of 1812 as an example."
         },
         {
             "id": 9,
@@ -288,7 +316,7 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. There is no time limit; they must research until they find a definitive primary source."
             ],
             "correct": "B. 5 minutes.",
-            "exp": "Under the evaluation guidelines, agents should not spend more than 5 minutes researching topics to verify factual accuracy."
+            "exp": "Under the evaluation guidelines, agents should not spend more than 5 minutes researching topics to verify accuracy."
         },
         {
             "id": 10,
@@ -300,48 +328,82 @@ elif app_mode == "🧠 Interactive Knowledge Check":
                 "D. Because the prompt was evaluated using the 'Prompt as Context' rule to reveal hateful intent."
             ],
             "correct": "A. Because a main tenet of Islam is that no physical depiction of the Prophet Mohammad exists; thus, any depiction is factually inaccurate.",
-            "exp": "Because a core tenet of Islam is that no physical depiction of the Prophet Mohammad exists, returning any image representing him is factually inaccurate. This covers all permutations of his name."
+            "exp": "Because a core tenet of Islam is that no physical depiction of the Prophet Mohammad exists, returning any image representing him is automatically factually inaccurate."
         }
     ]
 
-    score = 0
-    total_q = len(questions)
+    idx = st.session_state.quiz_index
 
-    # Secure form configuration avoiding internal formatting conflicts
-    with st.form("pkt_quiz_form"):
-        user_answers = {}
-        for item in questions:
-            st.markdown(f"**Q{item['id']}: {item['q']}**")
-            user_answers[item["id"]] = st.radio(
-                "Select your option:", 
-                item["options"], 
-                key=f"q_{item['id']}",
-                index=None
-            )
-            st.write("")
+    if idx < len(questions):
+        current_q = questions[idx]
         
-        submitted = st.form_submit_with_button("Submit Quiz Answers")
-
-    if submitted:
-        st.write("---")
-        st.subheader("📊 Performance Results")
+        # Display Random Cold Caller Assignment Box
+        if st.session_state.selected_victim:
+            st.html(f"""
+            <div class="cold-call-box">
+                🎯 <b>Cold Caller Selection:</b> Next up to answer this question is: 
+                <span style="color:#2563EB; font-weight:bold; font-size:1.15rem;">{st.session_state.selected_victim}</span>
+            </div>
+            """)
         
-        for item in questions:
-            selected = user_answers[item["id"]]
-            if selected == item["correct"]:
-                score += 1
-                st.success(f"✅ **Question {item['id']}: Correct!**")
-            else:
-                st.error(f"❌ **Question {item['id']}: Incorrect**")
-                st.write(f"*Your Answer:* {selected}")
-                st.write(f"*Correct Answer:* {item['correct']}")
-            
-            st.caption(f"**Explanation:** {item['exp']}")
+        st.markdown(f"### **Question {idx + 1} of {len(questions)}**")
+        st.markdown(f"#### {current_q['q']}")
+        
+        # Use explicit Radio keying mapped to the question tracking index
+        user_choice = st.radio("Choose the correct answer variant:", current_q["options"], key=f"active_q_{idx}", index=None)
+        
+        if user_choice:
             st.write("---")
-            
-        final_percentage = (score / total_q) * 100
-        if final_percentage >= 80:
+            if user_choice == current_q["correct"]:
+                st.balloons()
+                st.success("🎉 **Correct! Stellar Job!**")
+                st.html(f"<div style='color:#155724; background-color:#d4edda; padding:1rem; border-radius:0.25rem; margin-bottom:1rem;'><b>KB Guidance:</b> {current_q['exp']}</div>")
+                
+                # Setup a progression configuration button to avoid state looping
+                if st.button("Move to Next Question ➡️"):
+                    st.session_state.quiz_score += 1
+                    st.session_state.quiz_index += 1
+                    st.session_state.selected_victim = random.choice(team_members)
+                    st.rerun()
+            else:
+                st.error("😢🌧️💔 **Incorrect Option Selected!**")
+                st.html(f"<div style='color:#721c24; background-color:#f8d7da; padding:1rem; border-radius:0.25rem; margin-bottom:1rem;'><b>Incorrect Selection Feedback:</b> That wasn't quite it.<br><br><b>Correct Answer Structural Path:</b> {current_q['correct']}<br><br><b>KB Context Logic:</b> {current_q['exp']}</div>")
+                
+                if st.button("Proceed to Next Question ➡️"):
+                    st.session_state.quiz_index += 1
+                    st.session_state.selected_victim = random.choice(team_members)
+                    st.rerun()
+                    
+    else:
+        st.subheader("🏁 Performance Review Complete")
+        final_score = st.session_state.quiz_score
+        pct = (final_score / len(questions)) * 100
+        
+        if pct >= 80:
             st.balloons()
-            st.success(f"🏆 Great job! Final Score: **{score}/{total_q}** ({final_percentage}%) - Ready for PKT!")
+            st.success(f"🏆 Final Assessment Score: **{final_score} / {len(questions)}** ({pct}%). Team Cabia is ready to dominate the PKT validation tracking metrics!")
         else:
-            st.warning(f"🔄 Practice makes perfect. Final Score: **{score}/{total_q}** ({final_percentage}%) - Review the pillars and try again.")
+            st.warning(f"🔄 Final Assessment Score: **{final_score} / {len(questions)}** ({pct}%). Review the core scope edge-cases to streamline alignment evaluation accuracy.")
+            
+        if st.button("🔄 Restart Challenge Suite"):
+            st.session_state.quiz_index = 0
+            st.session_state.quiz_score = 0
+            st.session_state.selected_victim = random.choice(team_members)
+            st.rerun()
+
+# ==========================================
+# LINEAR STEPPER TOOLBAR FOOTER
+# ==========================================
+st.write("---")
+footer_col1, footer_col2, footer_col3 = st.columns([1, 2, 1])
+
+with footer_col1:
+    if st.session_state.page_index > 0:
+        st.button("⬅️ Back", on_click=prev_page, use_container_width=True)
+
+with footer_col2:
+    st.center = st.caption(f"Current Deck Progress Pillar: Step {st.session_state.page_index + 1} of {len(pages)} — ({current_page})")
+
+with footer_col3:
+    if st.session_state.page_index < len(pages) - 1:
+        st.button("Next ➡️", on_click=next_page, use_container_width=True)
