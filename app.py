@@ -8,17 +8,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Crucial JS Injector: Forces the browser context to scroll back up to (0,0) on page loads
-st.components.v1.html(
-    """
-    <script>
-        window.parent.document.querySelector('.main .block-container').scrollIntoView({behavior: 'instant'});
-    </script>
-    """,
-    height=0,
-    width=0
-)
-
 # Custom Styling & HTML Headers safely injected
 st.html("""
 <style>
@@ -97,6 +86,21 @@ def next_page():
 def prev_page():
     if st.session_state.page_index > 0:
         st.session_state.page_index -= 1
+
+# ==========================================
+# 🌟 TOP NAVIGATION BAR
+# ==========================================
+top_col1, top_col2, top_col3 = st.columns([1, 2, 1])
+with top_col1:
+    if st.session_state.page_index > 0:
+        st.button("⬅️ Previous Section", on_click=prev_page, key="top_prev", use_container_width=True)
+with top_col2:
+    st.html(f"<div style='text-align:center; color:#4B5563; font-weight:600; padding-top:0.4rem;'>Pillar {st.session_state.page_index + 1} of {len(pages)}: {current_page}</div>")
+with top_col3:
+    if st.session_state.page_index < len(pages) - 1:
+        st.button("Next Section ➡️", on_click=next_page, key="top_next", use_container_width=True)
+
+st.write("---")
 
 # ==========================================
 # PAGE 0: OVERVIEW & OBJECTIVES
@@ -236,7 +240,6 @@ elif current_page == "💡 Prompt Engineering (Examples)":
 elif current_page == "🧠 Interactive Knowledge Check":
     st.header("✏️ PKT Practice Challenge (One-by-One Engine)")
     
-    # Quiz Data Matrix incorporating comprehensive explanations
     questions = [
         {
             "id": 1,
@@ -365,7 +368,6 @@ elif current_page == "🧠 Interactive Knowledge Check":
     if idx < len(questions):
         current_q = questions[idx]
         
-        # Display Random Cold Caller Assignment Box
         if st.session_state.selected_victim:
             st.html(f"""
             <div class="cold-call-box">
@@ -375,7 +377,6 @@ elif current_page == "🧠 Interactive Knowledge Check":
             </div>
             """)
         
-        # Spin the wheel button pulls exclusively from remaining elements inside session pool
         if st.button("🎲 Spin the Wheel (Pick another unique Operator)"):
             if st.session_state.available_pool:
                 st.session_state.selected_victim = random.choice(st.session_state.available_pool)
@@ -438,18 +439,15 @@ elif current_page == "🧠 Interactive Knowledge Check":
             st.rerun()
 
 # ==========================================
-# LINEAR STEPPER TOOLBAR FOOTER
+# 🌟 BOTTOM PARALLEL NAVIGATION BAR
 # ==========================================
 st.write("---")
 footer_col1, footer_col2, footer_col3 = st.columns([1, 2, 1])
-
 with footer_col1:
     if st.session_state.page_index > 0:
-        st.button("⬅️ Back", on_click=prev_page, use_container_width=True)
-
+        st.button("⬅️ Previous Section", on_click=prev_page, key="bottom_prev", use_container_width=True)
 with footer_col2:
-    st.center = st.caption(f"Current Deck Progress Pillar: Step {st.session_state.page_index + 1} of {len(pages)} — ({current_page})")
-
+    st.html(f"<div style='text-align:center; color:#9CA3AF; font-size:0.85rem;'>Current Deck Progress Pillar: Step {st.session_state.page_index + 1} of {len(pages)}</div>")
 with footer_col3:
     if st.session_state.page_index < len(pages) - 1:
-        st.button("Next ➡️", on_click=next_page, use_container_width=True)
+        st.button("Next Section ➡️", on_click=next_page, key="bottom_next", use_container_width=True)
